@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 # Replace these with your database credentials
-DATABASE_URL = "postgresql://username:password@localhost/dbname"
+DATABASE_URL = "postgresql://postgres:eYl7DP0W10K3DMUH25md@containers-us-west-98.railway.app:6807/railway"
 
 # Create a SQLAlchemy engine and session
 engine = create_engine(DATABASE_URL)
@@ -24,9 +24,9 @@ Base = declarative_base()
 
 # Define the SQLAlchemy model for the database table
 class StringData(Base):
-    __tablename__ = "string_data"
+    __tablename__ = "data"
     id = Column(Integer, primary_key=True, index=True)
-    data = Column(String, index=True)
+    timestamp = Column(String, index=True)
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
@@ -51,4 +51,4 @@ async def store_data(data_input: DataInput):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="containers-us-west-98.railway.app", port=6807)
