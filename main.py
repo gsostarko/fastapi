@@ -1,48 +1,48 @@
-from flask import Flask, request, jsonify
-import psycopg2
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-app = Flask(__name__)
+# Define your database connection URL
+DATABASE_URL = "postgresql://postgres:eYl7DP0W10K3DMUH25md@containers-us-west-98.railway.app:6807/railway"
 
-# Database connection parameters
-db_params = {
-    'database': 'railway',
-    'user': 'postgres',
-    'password': 'eYl7DP0W10K3DMUH25md',
-    'host': 'containers-us-west-98.railway.app',  # e.g., localhost or IP address
-    'port': '6807'   # e.g., 5432
-}
+# Create a SQLAlchemy engine and session
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Create a table to store data in PostgreSQL
-def create_table():
-    conn = psycopg2.connect(**db_params)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS data (
-            id SERIAL PRIMARY KEY,
-            timestamp TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+Base = declarative_base()
 
-@app.route('/upload', methods=['POST'])
-def upload_data():
+# Define your data model
+class SensorData(Base):
+    __tablename__ = "sensor_data"
+
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(String)
+
+# Initialize the FastAPI app
+app = FastAPI()
+
+# Pydantic model for data validation
+class DataInput(BaseModel):
+    data: str
+
+@app.post("/upload", response_model=dict)
+async def upload_data(data_input: DataInput):
     try:
-        data = request.json.get('data')  # Assuming JSON data
-        if data is None:
-            return jsonify({"message": "No data provided"}), 400
-
-        # Save data to the PostgreSQL database
-        conn = psycopg2.connect(**db_params)
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO data (timestamp) VALUES (%s)", (data,))
-        conn.commit()
-        conn.close()
-
-        return jsonify({"message": "Data saved successfully"}), 200
+        # Create a new record in the database
+        db = SessionLocal()
+        db_data = SensorData(data=data_input.data)
+        db.add(db_data)
+        db.commit()
+        db.refresh(db_data)
+        db.close()
+        return {"message": "Data saved successfully"}
     except Exception as e:
-        return jsonify({"message": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == '__main__':
-    create_table()  # Create the table if it doesn't exist
-    app.run(host='containers-us-west-98.railway.app', port=6807)
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="containers-us-west-98.railway.app", port=6807)
