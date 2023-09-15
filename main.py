@@ -19,7 +19,7 @@ def index():
         if user_input:
             # Save the user input to the database
             cursor = db_conn.cursor()
-            cursor.execute("INSERT INTO user_data (input_data) VALUES (%s)", (user_input,))
+            cursor.execute("INSERT INTO data (timestamp) VALUES (%s)", (user_input,))
             db_conn.commit()
             cursor.close()
             return redirect(url_for("index"))
