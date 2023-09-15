@@ -1,46 +1,29 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from sqlalchemy import Integer, create_engine, Column, String
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from flask import Flask, render_template, request, redirect, url_for
+import psycopg2
 
-# Replace these with your database credentials
-DATABASE_URL = "postgresql://postgres:eYl7DP0W10K3DMUH25md@containers-us-west-98.railway.app:6807/railway"
+app = Flask(__name__)
 
-# Create a SQLAlchemy engine and session
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Configure the PostgreSQL database connection
+db_conn = psycopg2.connect(
+    dbname="railway",
+    user="postgres",
+    password="eYl7DP0W10K3DMUH25md",
+    host="containers-us-west-98.railway.app",  # Change this if your database is on a different host
+    port="6807"  # Change this if your PostgreSQL port is different
+)
 
-# Create a SQLAlchemy Base object
-Base = declarative_base()
-
-# Define the SQLAlchemy model for the database table
-class StringData(Base):
-    __tablename__ = "string_data"
-    id = Column(Integer, primary_key=True, index=True)
-    data = Column(String, index=True)
-
-# Create the database tables
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
-
-# Pydantic model for the incoming data
-class DataInput(BaseModel):
-    data: str
-
-# Create a route to handle the POST request
-@app.get("/store-data/{data_input}")
-async def store_data(data_input: DataInput):
-    # Create a new record in the database
-    db = SessionLocal()
-    db_data = StringData(data=data_input.data)
-    db.add(db_data)
-    db.commit()
-    db.refresh(db_data)
-    db.close()
-    return {"message": "Data stored successfully"}
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        user_input = request.form.get("user_input")
+        if user_input:
+            # Save the user input to the database
+            cursor = db_conn.cursor()
+            cursor.execute("INSERT INTO user_data (input_data) VALUES (%s)", (user_input,))
+            db_conn.commit()
+            cursor.close()
+            return redirect(url_for("index"))
+    return render_template("index.html")
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="containers-us-west-98.railway.app", port=6807)
+    app.run(debug=True)
