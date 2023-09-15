@@ -30,7 +30,7 @@ class DataInput(BaseModel):
     data: str
 
 # Create a route to handle the POST request
-@app.post("/store-data/")
+@app.post("/store-data/{data_input}")
 async def store_data(data_input: DataInput):
     # Create a new record in the database
     db = SessionLocal()
