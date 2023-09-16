@@ -16,7 +16,7 @@ Base = declarative_base()
 
 # Define your data model
 class SensorData(Base):
-    __tablename__ = "sensor_data"
+    __tablename__ = "data"
 
     id = Column(Integer, primary_key=True, index=True)
     timestamp = Column(String)
@@ -29,11 +29,11 @@ class DataInput(BaseModel):
     data: str
 
 @app.post("/upload/{data_input}")
-async def upload_data(data_input):
+async def upload_data(data_input: DataInput):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        db_data = SensorData(data=data_input)
+        db_data = SensorData(data=data_input.data)
         db.add(db_data)
         db.commit()
         db.refresh(db_data)
