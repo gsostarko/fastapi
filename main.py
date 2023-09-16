@@ -43,6 +43,26 @@ async def upload_data(data_input: str):
         raise HTTPException(status_code=500, detail=str(e))
         return {"message": data}
 
+@app.get("/get-last/")
+async def get_last_data():
+    try:
+        # Create a new database session
+        db = SessionLocal()
+
+        # Query the database to get the last row
+        last_data = db.query(SensorData).order_by(SensorData.id.desc()).first()
+
+        db.close()
+
+        if last_data is None:
+            raise HTTPException(status_code=404, detail="No data found")
+
+        # Convert the last data to a dictionary and return it
+        return last_data.__dict__
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
 
