@@ -28,12 +28,12 @@ app = FastAPI()
 class DataInput(BaseModel):
     data: str
 
-@app.post("/upload/{data_input}")
-async def upload_data(data_input: DataInput):
+@app.post("/upload/{data}")
+async def upload_data(data):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        db_data = SensorData(timestamp=data_input.data)
+        db_data = SensorData(timestamp=data)
         db.add(db_data)
         db.commit()
         db.refresh(db_data)
@@ -45,4 +45,4 @@ async def upload_data(data_input: DataInput):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="containers-us-west-98.railway.app", port=6807)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
