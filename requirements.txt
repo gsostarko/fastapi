@@ -4,4 +4,4 @@ sqlalchemy
 psycopg2
 pydantic
 uvicorn
-flask
+pywhatkit
