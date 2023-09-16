@@ -25,15 +25,15 @@ class SensorData(Base):
 app = FastAPI()
 
 # Pydantic model for data validation
-class DataInput(BaseModel):
+class DataInput(str):
     data: str
 
-@app.post("/upload/{data}")
-async def upload_data(data):
+@app.get("/upload/{data_input}")
+async def upload_data(data_input: str):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        db_data = SensorData(timestamp=data)
+        db_data = SensorData(timestamp=data_input)
         db.add(db_data)
         db.commit()
         db.refresh(db_data)
@@ -41,6 +41,7 @@ async def upload_data(data):
         return {"message": "Data saved successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+        return {"message": data}
 
 if __name__ == "__main__":
     import uvicorn
