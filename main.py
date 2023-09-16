@@ -5,6 +5,8 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+import pywhatkit
+
 # Define your database connection URL
 DATABASE_URL = "postgresql://postgres:eYl7DP0W10K3DMUH25md@containers-us-west-98.railway.app:6807/railway"
 
@@ -40,10 +42,15 @@ async def upload_data(data_input: str):
         db.commit()
         db.refresh(db_data)
         db.close()
+        date_data = data_input.split("---",1)
+        print(date_data[1])
+        time = date_data[1].split(".",3)
+        print(time[0], time[1])
+        pywhatkit.sendwhatmsg('+385981372306', data_input, int(time[0]), int(time[1])+1)
         return {"message": "Data saved successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        return {"message": data}
+        return {"message": data_input}
 
 @app.get("/get-last/",
         summary = "Get last row of database",
