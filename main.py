@@ -28,12 +28,12 @@ app = FastAPI()
 class DataInput(BaseModel):
     data: str
 
-@app.post("/upload/{data_input}", response_model=dict)
-async def upload_data(data_input: DataInput):
+@app.post("/upload/{data_input}")
+async def upload_data(data_input):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        db_data = SensorData(data=data_input.data)
+        db_data = SensorData(data=data_input)
         db.add(db_data)
         db.commit()
         db.refresh(db_data)
