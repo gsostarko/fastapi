@@ -28,7 +28,7 @@ app = FastAPI()
 class DataInput(BaseModel):
     data: str
 
-@app.post("/upload/{data}", response_model=dict)
+@app.post("/upload/{data_input}", response_model=dict)
 async def upload_data(data_input: DataInput):
     try:
         # Create a new record in the database
