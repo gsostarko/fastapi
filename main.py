@@ -47,7 +47,7 @@ async def upload_data(data_input: str):
 
 @app.get("/get-last/",
         summary = "Get last row of database",
-        descritpion = "Returns the last measurement from the database")
+        description = "Returns the last measurement from the database")
 async def get_last_data():
     try:
         # Create a new database session
