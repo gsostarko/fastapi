@@ -28,7 +28,9 @@ app = FastAPI()
 class DataInput(str):
     data: str
 
-@app.get("/upload/{data_input}")
+@app.get("/upload/{data_input}",
+         summary="Measurement input",
+         description="Saves timestamp, temperature, humidity and battery SoC in the database")
 async def upload_data(data_input: str):
     try:
         # Create a new record in the database
@@ -43,7 +45,9 @@ async def upload_data(data_input: str):
         raise HTTPException(status_code=500, detail=str(e))
         return {"message": data}
 
-@app.get("/get-last/")
+@app.get("/get-last/",
+        summary = "Get last row of database",
+        descritpion = "Returns the last measurement from the database")
 async def get_last_data():
     try:
         # Create a new database session
