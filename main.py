@@ -84,10 +84,10 @@ async def get_last_data():
 
         # Convert the last data to a dictionary and return it
         return last_data.__dict__
-
+        push()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    push()
+    
 
 if __name__ == "__main__":
     import uvicorn
