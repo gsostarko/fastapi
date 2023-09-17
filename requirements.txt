@@ -4,4 +4,4 @@ sqlalchemy
 psycopg2
 pydantic
 uvicorn
-pushbullet-python
+pushbullet.py 0.9.1 
