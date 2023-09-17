@@ -6,11 +6,17 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-from pushbullet import API
-api = API()
+from pushbullet import Pushbullet
 API_KEY = "o.K5e3K1r0RnVaIply9WPUAmV9krM1yd9R"
-api.set_token(API_KEY)
+pb = Pushbullet(API_KEY)
 
+
+
+
+def push(data):
+    value = data["timestamp"]
+    pb.push_note("ESP32",f"The last timestamp is: {value}")
+    print(data)
 
 # Define your database connection URL
 DATABASE_URL = "postgresql://postgres:eYl7DP0W10K3DMUH25md@containers-us-west-98.railway.app:6807/railway"
@@ -67,20 +73,21 @@ async def get_last_data():
 
         # Query the database to get the last row
         last_data = db.query(SensorData).order_by(SensorData.id.desc()).first()
-
+        push(last_data.__dict__)
         db.close()
 
         if last_data is None:
             raise HTTPException(status_code=404, detail="No data found")
 
+        
         # Convert the last data to a dictionary and return it
         return last_data.__dict__
 
-
-        api.send_note("ESP32",f"The last timestamp is: {last_data}")
+        
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+        
 
 if __name__ == "__main__":
     import uvicorn
