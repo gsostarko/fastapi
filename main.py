@@ -6,19 +6,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-#TEST
-import http.client, urllib
-
-def push():
-    conn = http.client.HTTPSConnection("api.pushover.net:443")
-    conn.request("POST", "/1/messages.json",
-      urllib.parse.urlencode({
-    "token": "awo869wegvuxbiriutyexs3y1e2ys5",
-    "user": "u7923r1cewg4si6vuoqxg7umgj3638",
-    "message": "hello world",
-  }), { "Content-type": "application/x-www-form-urlencoded" })
-    conn.getresponse()
-
+from pushbullet import API
+api = API()
+API_KEY = "o.K5e3K1r0RnVaIply9WPUAmV9krM1yd9R"
+api.set_token(API_KEY)
 
 
 # Define your database connection URL
@@ -84,7 +75,11 @@ async def get_last_data():
 
         # Convert the last data to a dictionary and return it
         return last_data.__dict__
-        push()
+
+
+        api.send_note(
+    "ESP32",
+    f"The last timestamp is: {last_data}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
