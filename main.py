@@ -77,9 +77,7 @@ async def get_last_data():
         return last_data.__dict__
 
 
-        api.send_note(
-    "ESP32",
-    f"The last timestamp is: {last_data}")
+        api.send_note("ESP32",f"The last timestamp is: {last_data}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
