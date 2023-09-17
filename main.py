@@ -7,6 +7,21 @@ from sqlalchemy.orm import sessionmaker
 
 import pywhatkit
 
+#TEST
+import http.client, urllib
+
+def push():
+    conn = http.client.HTTPSConnection("api.pushover.net:443")
+    conn.request("POST", "/1/messages.json",
+      urllib.parse.urlencode({
+    "token": "awo869wegvuxbiriutyexs3y1e2ys5",
+    "user": "u7923r1cewg4si6vuoqxg7umgj3638",
+    "message": "hello world",
+  }), { "Content-type": "application/x-www-form-urlencoded" })
+    conn.getresponse()
+
+
+
 # Define your database connection URL
 DATABASE_URL = "postgresql://postgres:eYl7DP0W10K3DMUH25md@containers-us-west-98.railway.app:6807/railway"
 
@@ -73,6 +88,7 @@ async def get_last_data():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    push()
 
 if __name__ == "__main__":
     import uvicorn
