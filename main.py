@@ -39,7 +39,7 @@ class SensorData(Base):
 app = FastAPI()
 
 # Pydantic model for data validation
-class SensorData(BaseModel):
+class ValidationData(BaseModel):
     date: str
     time: str
     temperature: float
@@ -48,7 +48,7 @@ class SensorData(BaseModel):
 @app.get("/data/",
          summary="Measurement input",
          description="Saves timestamp, temperature, humidity and battery SoC in the database")
-async def upload_data(data: SensorData):
+async def upload_data(data: ValidationData):
     try:
         # Create a new record in the database
         db = SessionLocal()
