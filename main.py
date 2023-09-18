@@ -32,7 +32,7 @@ class SensorData(Base):
     __tablename__ = "data"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(String)
+    date = Column(String)
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -41,14 +41,14 @@ app = FastAPI()
 class DataInput(str):
     data: str
 
-@app.get("/upload/{data_input}/{time}",
+@app.get("/upload/{date}/{time}",
          summary="Measurement input",
          description="Saves timestamp, temperature, humidity and battery SoC in the database")
-async def upload_data(data_input: str):
+async def upload_data(date: str, time: str):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        db_data = SensorData(timestamp=data_input)
+        db_data = SensorData(date=date)
         db.add(db_data)
         db.commit()
         db.refresh(db_data)
@@ -58,7 +58,9 @@ async def upload_data(data_input: str):
         time = date_data[1].split(".",3)
         print(time[0], time[1])
         
-        return {"message": "Data saved successfully"}
+        return {"message": "Data saved successfully",
+               "date" : date,
+               "time": time}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         return {"message": data_input}
