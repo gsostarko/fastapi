@@ -34,6 +34,9 @@ class SensorData(Base):
     id = Column(Integer, primary_key=True, index=True)
     date = Column(String)
     time = Column(String)
+    temperature = Column(Float)
+    humidity = Column(Float)
+    SoC = Column(Integer)
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -44,6 +47,7 @@ class ValidationData(BaseModel):
     time: str
     temperature: float
     humidity: float
+    Soc: int
 
 @app.post("/data",
          summary="Measurement input",
@@ -52,15 +56,15 @@ async def upload_data(data: ValidationData):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        #db_data = SensorData(date=date, time=time)
-        #db.add(db_data)
-        #db.commit()
-        #db.refresh(db_data)
-        #db.close()
-        #date_data = data_input.split("---",1)
-        #print(date_data[1])
-        #time = date_data[1].split(".",3)
-        #print(time[0], time[1])
+        db_data = SensorData(date=date, time=time)
+        db.add(db_data)
+        db.commit()
+        db.refresh(db_data)
+        db.close()
+        date_data = data_input.split("---",1)
+        print(date_data[1])
+        time = date_data[1].split(".",3)
+        print(time[0], time[1])
         
         return {"message": "Data saved successfully",
               "data": data}
