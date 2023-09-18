@@ -63,7 +63,7 @@ async def upload_data(data: SensorData):
         #print(time[0], time[1])
         
         return {"message": "Data saved successfully",
-              data}
+              "data": data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         return {"message": data_input}
