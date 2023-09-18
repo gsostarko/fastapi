@@ -33,6 +33,7 @@ class SensorData(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(String)
+    time = Column(String)
 
 # Initialize the FastAPI app
 app = FastAPI()
