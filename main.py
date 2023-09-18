@@ -39,29 +39,31 @@ class SensorData(Base):
 app = FastAPI()
 
 # Pydantic model for data validation
-class DataInput(str):
-    data: str
+class SensorData(BaseModel):
+    date: str
+    time: str
+    temperature: float
+    humidity: float
 
-@app.get("/upload/{date}/{time}",
+@app.get("/data/",
          summary="Measurement input",
          description="Saves timestamp, temperature, humidity and battery SoC in the database")
-async def upload_data(date: str, time: str):
+async def upload_data(data: SensorData):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        db_data = SensorData(date=date, time=time)
-        db.add(db_data)
-        db.commit()
-        db.refresh(db_data)
-        db.close()
-        date_data = data_input.split("---",1)
-        print(date_data[1])
-        time = date_data[1].split(".",3)
-        print(time[0], time[1])
+        #db_data = SensorData(date=date, time=time)
+        #db.add(db_data)
+        #db.commit()
+        #db.refresh(db_data)
+        #db.close()
+        #date_data = data_input.split("---",1)
+        #print(date_data[1])
+        #time = date_data[1].split(".",3)
+        #print(time[0], time[1])
         
         return {"message": "Data saved successfully",
-               "date" : date,
-               "time": time}
+              data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
         return {"message": data_input}
