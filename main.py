@@ -49,7 +49,7 @@ async def upload_data(date: str, time: str):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        db_data = SensorData(date=date)
+        db_data = SensorData(date=date, time=time)
         db.add(db_data)
         db.commit()
         db.refresh(db_data)
