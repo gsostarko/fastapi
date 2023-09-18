@@ -45,7 +45,7 @@ class ValidationData(BaseModel):
     temperature: float
     humidity: float
 
-@app.get("/data/",
+@app.post("/data/",
          summary="Measurement input",
          description="Saves timestamp, temperature, humidity and battery SoC in the database")
 async def upload_data(data: ValidationData):
