@@ -32,7 +32,7 @@ class SensorData(Base):
     __tablename__ = "data"
 
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(String)
+    timestamp = Column(String)
     time = Column(String)
     temperature = Column(Float)
     humidity = Column(Float)
@@ -43,7 +43,7 @@ app = FastAPI()
 
 # Pydantic model for data validation
 class ValidationData(BaseModel):
-    date: str
+    timestamp: str
     time: str
     temperature: float
     humidity: float
@@ -56,7 +56,7 @@ async def upload_data(data: ValidationData):
     try:
         # Create a new record in the database
         db = SessionLocal()
-        db_data = SensorData(date=date, time=time)
+        db_data = SensorData(data)
         db.add(db_data)
         db.commit()
         db.refresh(db_data)
