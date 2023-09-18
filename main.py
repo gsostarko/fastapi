@@ -36,7 +36,7 @@ class SensorData(Base):
     time = Column(String)
     temperature = Column(Float)
     humidity = Column(Float)
-    SoC = Column(Integer)
+    soc = Column(Integer)
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -47,7 +47,7 @@ class ValidationData(BaseModel):
     time: str
     temperature: float
     humidity: float
-    Soc: int
+    soc: int
 
 @app.post("/data",
          summary="Measurement input",
