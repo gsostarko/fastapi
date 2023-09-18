@@ -41,7 +41,7 @@ app = FastAPI()
 class DataInput(str):
     data: str
 
-@app.get("/upload/date={data_input}/time{time}",
+@app.get("/upload/{data_input}/{time}",
          summary="Measurement input",
          description="Saves timestamp, temperature, humidity and battery SoC in the database")
 async def upload_data(data_input: str):
