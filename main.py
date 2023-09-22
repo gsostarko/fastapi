@@ -23,7 +23,7 @@ pb = Pushbullet(os.getenv("PUSHBULLET_API_KEY"))
 
 
 def push(data):
-    value = data["timestamp"]
+    value = data
     pb.push_note("ESP32",f"The last timestamp is: {value}")
     print(data)
 
