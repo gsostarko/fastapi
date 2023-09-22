@@ -1,15 +1,24 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
-
+from dotenv import load_dotenv 
 from pushbullet import Pushbullet
-API_KEY = "o.K5e3K1r0RnVaIply9WPUAmV9krM1yd9R"
-pb = Pushbullet(API_KEY)
+import os
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
+
+load_dotenv('.env')             #os.getenv('SECRET_KEY')
+
+app = FastAPI()
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+
+
+pb = Pushbullet(os.getenv("PUSHBULLET_API_KEY"))
 
 
 
@@ -19,10 +28,10 @@ def push(data):
     print(data)
 
 # Define your database connection URL
-DATABASE_URL = "postgresql://postgres:eYl7DP0W10K3DMUH25md@containers-us-west-98.railway.app:6807/railway"
+
 
 # Create a SQLAlchemy engine and session
-engine = create_engine(DATABASE_URL)
+engine = create_engine(os.getenv("DATABASE_URL"))
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
@@ -61,16 +70,16 @@ async def upload_data(data: ValidationData):
         db.commit()
         db.refresh(db_data)
         db.close()
-        date_data = data_input.split("---",1)
-        print(date_data[1])
-        time = date_data[1].split(".",3)
-        print(time[0], time[1])
+        #date_data = data_input.split("---",1)
+        #print(date_data[1])
+        #time = date_data[1].split(".",3)
+        #print(time[0], time[1])
         
         return {"message": "Data saved successfully",
               "data": data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        return {"message": data_input}
+        #return {"message": data_input}
 
 @app.get("/get-last/",
         summary = "Get last row of database",
@@ -82,21 +91,29 @@ async def get_last_data():
 
         # Query the database to get the last row
         last_data = db.query(SensorData).order_by(SensorData.id.desc()).first()
-        push(last_data.__dict__)
+        push(last_data)
         db.close()
 
         if last_data is None:
-            raise HTTPException(status_code=404, detail="No data found")
-
-        
+            raise HTTPException(statusdata_input_code=404, detail="No data found")
         # Convert the last data to a dictionary and return it
         return last_data.__dict__
-
-        
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+@app.get("/get-all/")
+async def get_all(request: Request):
+    try:
+        db = SessionLocal()
+
+        all_data = db.query(SensorData).all()
+        db.close()
+
+        if all_data is None:
+            raise HTTPException(statusdata_input_code = 404, detail="No data found")
+        return templates.TemplateResponse("get-all.html", {"request" : request, "data": all_data})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))  
 
 if __name__ == "__main__":
     import uvicorn
